@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDC</title>
+    <script type="text/javascript" src="/eel.js"></script>
+    <script type="text/javascript">
+        var refreshing = false; // Flag to indicate if refresh is in progress
+
+        function loadDomains() {
+            eel.load_domains();
+        }
+
+        eel.expose(js_loadDomains);
+        function js_loadDomains(data) {
+            var tableBody = document.getElementById("table-body");
+            tableBody.innerHTML = ""; // Clear the existing table rows
+            for (var i = 0; i < data.length; i++) {
+                var row = document.createElement("tr");
+
+                var domainCell = document.createElement("td");
+                var domainText = document.createTextNode(data[i][0]);  // Domain is at index 0
+                domainCell.appendChild(domainText);
+                row.appendChild(domainCell);
+
+                var expiryCell = document.createElement("td");
+                var expiryText = document.createTextNode(data[i][1]);  // Expiry Date is at index 1
+                expiryCell.appendChild(expiryText);
+                row.appendChild(expiryCell);
+
+                tableBody.appendChild(row);
+            }
+
+            stopLoadingAnimation(); // Stop the spinning animation
+        }
+
+        eel.expose(clearDomains);
+        function clearDomains() {
+            var tableBody = document.getElementById("table-body");
+            tableBody.innerHTML = "";
+        }
+
+        eel.expose(js_addDomain);
+        function js_addDomain(domain, expiryDate) {
+            var tableBody = document.getElementById("table-body");
+            var row = document.createElement("tr");
+
+            var domainCell = document.createElement("td");
+            var domainText = document.createTextNode(domain);
+            domainCell.appendChild(domainText);
+            row.appendChild(domainCell);
+
+            var expiryCell = document.createElement("td");
+            var expiryText = document.createTextNode(expiryDate);
+            expiryCell.appendChild(expiryText);
+            row.appendChild(expiryCell);
+
+            tableBody.appendChild(row);
+        }
+
+        function performAction() {
+            if (!refreshing) {
+                startLoadingAnimation(); // Start the spinning animation
+                refreshing = true; // Set refreshing flag to true
+                eel.perform_refresh().then(function() {
+                    loadDomains(); // Call the existing loadDomains() function
+                    refreshing = false; // Set refreshing flag to false
+                });
+            }
+        }
+
+        function startLoadingAnimation() {
+            var button = document.querySelector('.refresh');
+            button.classList.add('loading');
+        }
+
+        function stopLoadingAnimation() {
+            var button = document.querySelector('.refresh');
+            button.classList.remove('loading');
+        }
+    </script>
+
+    <style>
+        @font-face {
+            font-family: 'Eight Bit Dragon';
+            src: url('EightBitDragon-anqx.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Eight Bit Dragon', sans-serif;
+        }
+        .container {
+            text-align: center;
+            font-family: 'Eight Bit Dragon', sans-serif;
+        }
+
+        table {
+            margin: 0 auto;
+        }
+
+        th {
+            text-align: left;
+            padding: 10px 40px;
+            padding-right: 40px;
+            padding-left: 40px;
+            color: #bfd6c0;
+        }
+
+        td:first-child {
+            text-align: left, center;
+        }
+
+        td:last-child {
+            text-align: right, center;
+            color: #5bf144;
+        }
+
+        td:last-child {
+            background: linear-gradient(
+                to right,
+                #fcfcfc 0%,
+                #d0ffc9 29%,
+                #95fd85 67%,
+                #5bf144 100%
+            );
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            -moz-background-clip: text;
+            -moz-text-fill-color: transparent;
+            animation: animate-row 2s linear infinite;
+            }
+
+        @keyframes animate-row {
+            0% {
+                background-position: 0% center;
+            }
+            50% {
+                background-position: 100% center;
+            }
+            100% {
+                background-position: 0% center;
+            }
+        }
+
+        button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1{
+            color: #f1e444
+        }
+
+        .refresh {
+            background: #7880e6;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.20);
+            padding: 8px;
+            border: 0;
+            border-radius: 20px;
+            width: 40px;
+            height: 40px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .refresh .icon {
+            fill: #323232;
+        }
+
+        .refresh:hover {
+            background: #def4d7;
+            cursor: pointer;
+        }
+
+        .refresh:active .icon {
+            fill: #5ac938;
+        }
+
+        .refresh.loading .icon {
+            animation: rotating 1.2s linear infinite;
+        }
+
+        @keyframes rotating {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+    </style>
+</head>
+<body onload="loadDomains()">
+    <div class="container">
+        <h1>POSLuH Domain Checker</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Domain</th>
+                    <th>Expiry Date</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr class="animate-row"></tr>
+            </tbody>
+        </table>
+        <button class="refresh" onclick="performAction()">
+            <svg class="icon" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
+                <path d="m23.8995816 10.3992354c0 .1000066-.1004184.1000066-.1004184.2000132 0 0 0 .1000066-.1004184.1000066-.1004184.1000066-.2008369.2000132-.3012553.2000132-.1004184.1000066-.3012552.1000066-.4016736.1000066h-6.0251046c-.6025105 0-1.0041841-.4000264-1.0041841-1.00006592 0-.60003954.4016736-1.00006591 1.0041841-1.00006591h3.5146443l-2.8117154-2.60017136c-.9037657-.90005932-1.9079498-1.50009886-3.0125523-1.90012523-2.0083682-.70004614-4.2175733-.60003954-6.12552305.30001977-2.0083682.90005932-3.41422594 2.50016478-4.11715481 4.5002966-.20083682.50003295-.80334728.80005275-1.30543933.60003954-.50209205-.10000659-.80334728-.70004613-.60251046-1.20007909.90376569-2.60017136 2.71129707-4.60030318 5.12133891-5.70037568 2.41004184-1.20007909 5.12133894-1.30008569 7.63179914-.40002637 1.4058578.50003296 2.7112971 1.30008569 3.7154812 2.40015819l3.0125523 2.70017795v-3.70024386c0-.60003955.4016736-1.00006591 1.0041841-1.00006591s1.0041841.40002636 1.0041841 1.00006591v6.00039545.10000662c0 .1000066 0 .2000132-.1004184.3000197zm-3.1129707 3.7002439c-.5020921-.2000132-1.1046025.1000066-1.3054394.6000396-.4016736 1.1000725-1.0041841 2.200145-1.9079497 3.0001977-1.4058578 1.5000989-3.5146444 2.3001516-5.623431 2.3001516-2.10878662 0-4.11715482-.8000527-5.72384938-2.4001582l-2.81171548-2.6001714h3.51464435c.60251046 0 1.0041841-.4000263 1.0041841-1.0000659 0-.6000395-.40167364-1.0000659-1.0041841-1.0000659h-6.0251046c-.10041841 0-.10041841 0-.20083682 0s-.10041841 0-.20083682 0c0 0-.10041841 0-.10041841.1000066-.10041841 0-.20083682.1000066-.20083682.2000132s0 .1000066-.10041841.1000066c0 .1000066-.10041841.1000066-.10041841.2000132v.2000131.1000066 6.0003955c0 .6000395.40167364 1.0000659 1.0041841 1.0000659s1.0041841-.4000264 1.0041841-1.0000659v-3.7002439l2.91213389 2.8001846c1.80753138 2.0001318 4.31799163 3.0001977 7.02928871 3.0001977 2.7112971 0 5.2217573-1.0000659 7.1297071-2.9001911 1.0041841-1.0000659 1.9079498-2.3001516 2.4100418-3.7002439.1004185-.6000395-.2008368-1.2000791-.7029288-1.3000857z" transform=""/>
+            </svg>
+        </button>
+    </div>
+    <script>
+        function toggleLoadingAnimation() {
+            var button = document.querySelector('.refresh');
+            button.classList.toggle('loading');
+        }
+
+        function performAction() {
+            if (!toggleLoadingAnimation.intervalId) {
+                toggleLoadingAnimation(); // Start loading animation
+
+                // Call the perform_refresh() function from Python
+                eel.perform_refresh().then(function () {
+                    toggleLoadingAnimation(); // Stop loading animation
+                });
+            }
+        }
+    </script>
+    <style>
+    </style>
+</body>
+</html>
