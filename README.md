@@ -1,2 +1,2 @@
 # PTP
-Inside the Playlist jammer folder is a simple sort by BPM program for .wav files.
+Private test projects with some usefulness on a private and public basis
