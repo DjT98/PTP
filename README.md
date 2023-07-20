@@ -1,2 +1,2 @@
 # PTP
-Private test projects with some usefulness on a private and public basis
+Private test projects with some usefulness on a private and public scale
